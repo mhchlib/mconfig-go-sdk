@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/tidwall/gjson"
+	"log"
 	"sync"
 )
 
@@ -31,7 +32,16 @@ func (m *Mconfig) getValueFromCache(key string, fieldType FieldType) (FieldInter
 
 }
 
-func (m *Mconfig) reloadConfigData(key string, fieldType FieldType) (FieldInterface, error) {
+func (m *Mconfig) reloadConfigData(key string, fieldType FieldType) (ret FieldInterface, err error) {
+	log.Println("------")
+	defer func() {
+		if err == nil {
+			//load the data to cache
+			m.opts.Cache.Lock()
+			m.opts.Cache.Cache[key] = &ret
+			m.opts.Cache.Unlock()
+		}
+	}()
 	configs := m.opts.ConfigsData
 	var value gjson.Result
 	flag := false

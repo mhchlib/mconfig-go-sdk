@@ -51,6 +51,12 @@ func (m *Mconfig) initMconfigLink() {
 				started <- &struct{}{}
 				once = false
 			}
+			//refer the cache
+			//todo: 这里可以优化为主动去更新cache中内容，但是这个需要加大cache大小，带上类型
+			// support soon....
+			m.opts.Cache.Lock()
+			m.opts.Cache.Cache = map[string]*FieldInterface{}
+			m.opts.Cache.Unlock()
 		}
 	}(stream, m, started)
 	<-started

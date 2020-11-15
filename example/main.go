@@ -10,7 +10,7 @@ func main() {
 	config := mconfig.NewMconfig(
 		mconfig.Registry(mconfig.RegisterType_Etcd, "etcd.u.hcyang.top:31770"),
 		mconfig.ABFilters("port", "8080"),
-		mconfig.ABFilters("address", "192.168.1.1"),
+		mconfig.ABFilters("ip", "192.0.0.1"),
 		mconfig.AppKey("1002"),
 		mconfig.ConfigKey("1000"),
 	)
