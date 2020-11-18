@@ -1,5 +1,7 @@
 package mconfig
 
+import "log"
+
 type Mconfig struct {
 	opts *Options
 }
@@ -12,6 +14,18 @@ func NewMconfig(opts ...Option) Config {
 	for _, o := range opts {
 		o(options)
 	}
+	if options.EnableRetry == false {
+		options.RetryNum = Default_Retry_Num
+	}
+
+	if options.EnableNameSpace == false {
+		options.NameSpace = Default_NameSpace
+	}
+
+	if options.EnableRegistry == false {
+		log.Fatal("[mconfig] you should set an Registry address to link mconfig server")
+	}
+
 	m := &Mconfig{}
 	m.opts = options
 	m.initMconfigLink()

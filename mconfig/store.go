@@ -33,7 +33,7 @@ func (m *Mconfig) getValueFromCache(key string, fieldType FieldType) (FieldInter
 }
 
 func (m *Mconfig) reloadConfigData(key string, fieldType FieldType) (ret FieldInterface, err error) {
-	log.Println("------")
+	log.Println("[mconfig] reload config from mconfig server")
 	defer func() {
 		if err == nil {
 			//load the data to cache

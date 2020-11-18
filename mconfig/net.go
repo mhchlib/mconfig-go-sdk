@@ -20,7 +20,7 @@ func (m *Mconfig) initMconfigLink() {
 		micro.Registry(reg),
 	)
 	mService.Init()
-	mConfigService := sdk.NewMConfigService("", mService.Client())
+	mConfigService := sdk.NewMConfigService(m.opts.NameSpace, mService.Client())
 	request := &sdk.GetVRequest{
 		AppId: m.opts.AppKey,
 		Filters: &sdk.ConfigFilters{
@@ -28,25 +28,30 @@ func (m *Mconfig) initMconfigLink() {
 			ExtraData: m.opts.ABFilters,
 		},
 	}
+
 	//添加连接断开重试机制
-	retryNum := 5
+	retryNum := m.opts.RetryNum
 	once := true
 	started := make(chan interface{})
 	go func(m *Mconfig, started chan interface{}) {
 		for retryNum >= 0 {
+			if retryNum != Default_Retry_Num {
+				log.Println("[mconfig] ", "mconfig retry link to mconfig server ... ")
+			}
 			stream, err := mConfigService.GetVStream(context.Background(), request)
 			if err != nil {
-				log.Println(err)
+				log.Println("[mconfig] ", err)
 				retryNum = retryNum - 1
 				continue
 			}
 			for {
 				recv, err := stream.Recv()
 				if err != nil {
-					log.Println(err)
+					log.Println("[mconfig] ", err)
 					retryNum = retryNum - 1
 					break
 				}
+				retryNum = m.opts.RetryNum
 				configs := recv.Configs
 				data := m.opts.ConfigsData
 				data.Lock()
@@ -66,7 +71,7 @@ func (m *Mconfig) initMconfigLink() {
 				m.opts.Cache.Unlock()
 			}
 		}
-		log.Println("mconfig retry fail... it does not work now....")
+		log.Println("[mconfig] ", "mconfig retry fail... it does not work now....")
 	}(m, started)
 	<-started
 	close(started)

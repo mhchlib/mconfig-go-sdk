@@ -7,14 +7,24 @@ var (
 	//RegisterType_Consoul RegisterType = "consoul"
 )
 
+const (
+	Default_Retry_Num = 5
+	Default_NameSpace = "com.github.mhchlib.mconfig"
+)
+
 type Options struct {
-	RegistryUrl  string
-	RegistryType Register_Type
-	ABFilters    map[string]string
-	AppKey       string
-	ConfigKeys   []string
-	ConfigsData  *OriginConfigCache
-	Cache        *ConfigCache
+	NameSpace       string
+	RegistryUrl     string
+	RegistryType    Register_Type
+	ABFilters       map[string]string
+	AppKey          string
+	ConfigKeys      []string
+	ConfigsData     *OriginConfigCache
+	Cache           *ConfigCache
+	RetryNum        int
+	EnableRetry     bool
+	EnableNameSpace bool
+	EnableRegistry  bool
 }
 
 func NewOptions() *Options {
@@ -32,6 +42,14 @@ func Registry(registerType Register_Type, registerUrl string) Option {
 	return func(options *Options) {
 		options.RegistryType = registerType
 		options.RegistryUrl = registerUrl
+		options.EnableRegistry = true
+	}
+}
+
+func NameSpace(namespace string) Option {
+	return func(options *Options) {
+		options.NameSpace = namespace
+		options.EnableNameSpace = true
 	}
 }
 
@@ -49,6 +67,13 @@ func ABFilters(key string, value string) Option {
 func AppKey(appKey string) Option {
 	return func(options *Options) {
 		options.AppKey = appKey
+	}
+}
+
+func Retry(num int) Option {
+	return func(options *Options) {
+		options.RetryNum = num
+		options.EnableRetry = true
 	}
 }
 
