@@ -28,37 +28,46 @@ func (m *Mconfig) initMconfigLink() {
 			ExtraData: m.opts.ABFilters,
 		},
 	}
-	stream, err := mConfigService.GetVStream(context.Background(), request)
-	if err != nil {
-		log.Fatal(err)
-	}
+	//添加连接断开重试机制
+	retryNum := 5
+	once := true
 	started := make(chan interface{})
-	go func(stream sdk.MConfig_GetVStreamService, m *Mconfig, started chan interface{}) {
-		once := true
-		for {
-			recv, err := stream.Recv()
+	go func(m *Mconfig, started chan interface{}) {
+		for retryNum >= 0 {
+			stream, err := mConfigService.GetVStream(context.Background(), request)
 			if err != nil {
 				log.Println(err)
+				retryNum = retryNum - 1
+				continue
 			}
-			configs := recv.Configs
-			data := m.opts.ConfigsData
-			data.Lock()
-			for _, config := range configs {
-				data.Data[config.Id] = config.Config
+			for {
+				recv, err := stream.Recv()
+				if err != nil {
+					log.Println(err)
+					retryNum = retryNum - 1
+					break
+				}
+				configs := recv.Configs
+				data := m.opts.ConfigsData
+				data.Lock()
+				for _, config := range configs {
+					data.Data[config.Id] = config.Config
+				}
+				data.Unlock()
+				if once {
+					started <- &struct{}{}
+					once = false
+				}
+				//refer the cache
+				//todo: 这里可以优化为主动去更新cache中内容，但是这个需要加大cache大小，带上类型
+				// support soon....
+				m.opts.Cache.Lock()
+				m.opts.Cache.Cache = map[string]*FieldInterface{}
+				m.opts.Cache.Unlock()
 			}
-			data.Unlock()
-			if once {
-				started <- &struct{}{}
-				once = false
-			}
-			//refer the cache
-			//todo: 这里可以优化为主动去更新cache中内容，但是这个需要加大cache大小，带上类型
-			// support soon....
-			m.opts.Cache.Lock()
-			m.opts.Cache.Cache = map[string]*FieldInterface{}
-			m.opts.Cache.Unlock()
 		}
-	}(stream, m, started)
+		log.Println("mconfig retry fail... it does not work now....")
+	}(m, started)
 	<-started
 	close(started)
 }
