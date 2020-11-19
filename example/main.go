@@ -13,7 +13,6 @@ func main() {
 		mconfig.ABFilters("ip", "192.0.0.1"),
 		mconfig.AppKey("1002"),
 		mconfig.ConfigKey("1000"),
-		mconfig.NameSpace("test"),
 		mconfig.Retry(2),
 	)
 	//`{"name":{"first":"Janet","last":"Prichard"},"age":47}`

@@ -5,20 +5,27 @@ import (
 	"github.com/mhchlib/mconfig-api/api/v1/sdk"
 	"github.com/micro/go-micro/v2"
 	"github.com/micro/go-micro/v2/registry"
-	etcdV "github.com/micro/go-micro/v2/registry/etcd"
+	//etcdV "github.com/micro/go-micro/v2/registry/etcd"
+	serviceRegistry "github.com/micro/go-micro/v2/registry/memory"
 	"log"
 )
 
 func (m *Mconfig) initMconfigLink() {
 	var reg registry.Registry
-	if m.opts.RegistryType == RegisterType_Etcd {
-		reg = etcdV.NewRegistry(func(options *registry.Options) {
-			options.Addrs = []string{m.opts.RegistryUrl} //地址
-		})
-	}
+	//if m.opts.RegistryType == RegisterType_Etcd {
+	//	reg = etcdV.NewRegistry(func(options *registry.Options) {
+	//		options.Addrs = []string{m.opts.RegistryUrl} //地址
+	//	})
+	//}
+
+	reg = serviceRegistry.NewRegistry(func(options *registry.Options) {
+		options.Addrs = []string{"127.0.0.1:8080"}
+	})
+
 	mService := micro.NewService(
 		micro.Registry(reg),
 	)
+
 	mService.Init()
 	mConfigService := sdk.NewMConfigService(m.opts.NameSpace, mService.Client())
 	request := &sdk.GetVRequest{
