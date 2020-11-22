@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-
 	// Set up a connection to the server.
 	conn, err := grpc.Dial("127.0.0.1:8080", grpc.WithInsecure())
 	if err != nil {
@@ -24,7 +23,8 @@ func main() {
 		"ip": "192.168.1.1",
 	}
 	log.Println("client listen app ", appId, " config ", configIds, " with data ", extreData)
-	resp, err := client.GetVStream(context.Background(), &sdk.GetVRequest{
+	resp, err := client.GetVStream(context.Background())
+	resp.SendMsg(&sdk.GetVRequest{
 		AppId: strconv.Itoa(appId),
 		Filters: &sdk.ConfigFilters{
 			ConfigIds: configIds,
@@ -38,14 +38,13 @@ func main() {
 	defer func() {
 		log.Println("close stream")
 	}()
-	//log.Info(a)
 	for {
 		config := sdk.GetVResponse{}
 		//config, err := resp.Recv()
 		err := resp.RecvMsg(&config)
 		//_, err := resp.Recv()
 		if err != nil {
-			log.Fatal(1111, err)
+			log.Fatal("err: ", err)
 			return
 		}
 		log.Println(appId, " get msg")

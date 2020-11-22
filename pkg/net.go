@@ -1,33 +1,24 @@
-package mconfig
+package pkg
 
 import (
 	"context"
 	"github.com/mhchlib/mconfig-api/api/v1/sdk"
-	"github.com/micro/go-micro/v2"
-	"github.com/micro/go-micro/v2/registry"
-	//etcdV "github.com/micro/go-micro/v2/registry/etcd"
-	serviceRegistry "github.com/micro/go-micro/v2/registry/memory"
+	"github.com/mhchlib/register"
+	etcd_kit "github.com/mhchlib/register/etcd-kit"
+	"google.golang.org/grpc"
+	"time"
+
+	//etcdV "github.com/micro/go-micro/v2/registry/etcd_custom"
 	"log"
 )
 
 func (m *Mconfig) initMconfigLink() {
-	var reg registry.Registry
-	//if m.opts.RegistryType == RegisterType_Etcd {
-	//	reg = etcdV.NewRegistry(func(options *registry.Options) {
-	//		options.Addrs = []string{m.opts.RegistryUrl} //地址
-	//	})
-	//}
-
-	reg = serviceRegistry.NewRegistry(func(options *registry.Options) {
-		options.Addrs = []string{"127.0.0.1:8080"}
+	var reg register.Register
+	reg = &etcd_kit.EtcdRegister{}
+	reg.Init(func(options *register.Options) {
+		options.NameSpace = m.opts.NameSpace
+		options.Address = m.opts.RegistryUrl
 	})
-
-	mService := micro.NewService(
-		micro.Registry(reg),
-	)
-
-	mService.Init()
-	mConfigService := sdk.NewMConfigService(m.opts.NameSpace, mService.Client())
 	request := &sdk.GetVRequest{
 		AppId: m.opts.AppKey,
 		Filters: &sdk.ConfigFilters{
@@ -37,28 +28,42 @@ func (m *Mconfig) initMconfigLink() {
 	}
 
 	//添加连接断开重试机制
-	retryNum := m.opts.RetryNum
+	retryTime := m.opts.RetryTime
 	once := true
 	started := make(chan interface{})
 	go func(m *Mconfig, started chan interface{}) {
-		for retryNum >= 0 {
-			if retryNum != Default_Retry_Num {
-				log.Println("[mconfig] ", "mconfig retry link to mconfig server ... ")
+		for {
+			if !once {
+				log.Println("[mconfig] ", "mconfig retry fail... it does not work now.... and will retry after ", retryTime)
 			}
-			stream, err := mConfigService.GetVStream(context.Background(), request)
+			<-time.After(retryTime)
+			service, err := reg.GetService("mconfig-sdk")
 			if err != nil {
 				log.Println("[mconfig] ", err)
-				retryNum = retryNum - 1
+				continue
+			}
+			dial, err := grpc.Dial(service, grpc.WithInsecure())
+			if err != nil {
+				log.Println("[mconfig] ", err)
+				continue
+			}
+			mConfigService := sdk.NewMConfigClient(dial)
+			stream, err := mConfigService.GetVStream(context.Background())
+			if err != nil {
+				log.Println("[mconfig] ", err)
+				continue
+			}
+			err = stream.SendMsg(request)
+			if err != nil {
+				log.Println("[mconfig] ", err)
 				continue
 			}
 			for {
 				recv, err := stream.Recv()
 				if err != nil {
 					log.Println("[mconfig] ", err)
-					retryNum = retryNum - 1
 					break
 				}
-				retryNum = m.opts.RetryNum
 				configs := recv.Configs
 				data := m.opts.ConfigsData
 				data.Lock()
@@ -78,7 +83,6 @@ func (m *Mconfig) initMconfigLink() {
 				m.opts.Cache.Unlock()
 			}
 		}
-		log.Println("[mconfig] ", "mconfig retry fail... it does not work now....")
 	}(m, started)
 	<-started
 	close(started)

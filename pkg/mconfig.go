@@ -1,4 +1,4 @@
-package mconfig
+package pkg
 
 import "log"
 
@@ -15,7 +15,7 @@ func NewMconfig(opts ...Option) Config {
 		o(options)
 	}
 	if options.EnableRetry == false {
-		options.RetryNum = Default_Retry_Num
+		options.RetryTime = Default_Retry_Time
 	}
 
 	if options.EnableNameSpace == false {
@@ -23,7 +23,7 @@ func NewMconfig(opts ...Option) Config {
 	}
 
 	if options.EnableRegistry == false {
-		log.Fatal("[mconfig] you should set an Registry address to link mconfig server")
+		log.Fatal("[pkg] you should set an Registry address to link pkg server")
 	}
 
 	m := &Mconfig{}

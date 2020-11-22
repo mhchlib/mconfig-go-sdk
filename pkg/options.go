@@ -1,27 +1,29 @@
-package mconfig
+package pkg
+
+import "time"
 
 type Register_Type string
 
 var (
-	RegisterType_Etcd Register_Type = "etcd"
+	RegisterType_Etcd Register_Type = "etcd_custom"
 	//RegisterType_Consoul RegisterType = "consoul"
 )
 
 const (
-	Default_Retry_Num = 5
-	Default_NameSpace = "com.github.mhchlib.mconfig"
+	Default_Retry_Time = 5 * time.Second
+	Default_NameSpace  = "com.github.mhchlib"
 )
 
 type Options struct {
 	NameSpace       string
-	RegistryUrl     string
+	RegistryUrl     []string
 	RegistryType    Register_Type
 	ABFilters       map[string]string
 	AppKey          string
 	ConfigKeys      []string
 	ConfigsData     *OriginConfigCache
 	Cache           *ConfigCache
-	RetryNum        int
+	RetryTime       time.Duration
 	EnableRetry     bool
 	EnableNameSpace bool
 	EnableRegistry  bool
@@ -38,7 +40,7 @@ func NewOptions() *Options {
 	return o
 }
 
-func Registry(registerType Register_Type, registerUrl string) Option {
+func Registry(registerType Register_Type, registerUrl []string) Option {
 	return func(options *Options) {
 		options.RegistryType = registerType
 		options.RegistryUrl = registerUrl
@@ -70,9 +72,9 @@ func AppKey(appKey string) Option {
 	}
 }
 
-func Retry(num int) Option {
+func RetryTime(t time.Duration) Option {
 	return func(options *Options) {
-		options.RetryNum = num
+		options.RetryTime = t
 		options.EnableRetry = true
 	}
 }

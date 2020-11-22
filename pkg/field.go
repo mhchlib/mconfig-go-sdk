@@ -1,4 +1,4 @@
-package mconfig
+package pkg
 
 const (
 	FieldType_String FieldType = iota

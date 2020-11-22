@@ -1,4 +1,4 @@
-package mconfig
+package pkg
 
 type Config interface {
 	String(key string, defaultV ...string) string
