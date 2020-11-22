@@ -1,10 +1,11 @@
-package mconfig
+package pkg
 
 import (
 	"encoding/json"
 	"errors"
 	"github.com/tidwall/gjson"
 	"log"
+	"strings"
 	"sync"
 )
 
@@ -33,7 +34,7 @@ func (m *Mconfig) getValueFromCache(key string, fieldType FieldType) (FieldInter
 }
 
 func (m *Mconfig) reloadConfigData(key string, fieldType FieldType) (ret FieldInterface, err error) {
-	log.Println("[mconfig] reload config from mconfig server")
+	log.Println("[pkg] reload config from pkg server")
 	defer func() {
 		if err == nil {
 			//load the data to cache
@@ -47,6 +48,7 @@ func (m *Mconfig) reloadConfigData(key string, fieldType FieldType) (ret FieldIn
 	flag := false
 	configs.RLock()
 	for _, v := range configs.Data {
+		v = strings.ReplaceAll(v, "'", "\"")
 		value = gjson.Get(v, key)
 		if value.Exists() {
 			flag = true

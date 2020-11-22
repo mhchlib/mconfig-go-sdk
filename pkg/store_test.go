@@ -1,4 +1,4 @@
-package mconfig
+package pkg
 
 import (
 	"github.com/tidwall/gjson"
