@@ -13,7 +13,7 @@ func main() {
 		pkg.ABFilters("ip", "192.0.0.1"),
 		pkg.AppKey("1002"),
 		pkg.ConfigKey("1000"),
-		pkg.RetryTime(5*time.Second),
+		pkg.RetryTime(15*time.Second),
 	)
 	//`{"name":{"first":"Janet","last":"Prichard"},"age":47}`
 	for {

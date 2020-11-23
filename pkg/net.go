@@ -26,23 +26,25 @@ func (m *Mconfig) initMconfigLink() {
 			ExtraData: m.opts.ABFilters,
 		},
 	}
-
 	//添加连接断开重试机制
 	retryTime := m.opts.RetryTime
 	once := true
+	enableRetry := false
 	started := make(chan interface{})
 	go func(m *Mconfig, started chan interface{}) {
 		for {
-			if !once {
+			if enableRetry {
+				<-time.After(retryTime)
 				log.Println("[mconfig] ", "mconfig retry fail... it does not work now.... and will retry after ", retryTime)
 			}
-			<-time.After(retryTime)
+			enableRetry = true
 			service, err := reg.GetService("mconfig-sdk")
 			if err != nil {
 				log.Println("[mconfig] ", err)
 				continue
 			}
-			dial, err := grpc.Dial(service, grpc.WithInsecure())
+			withTimeout, _ := context.WithTimeout(context.Background(), time.Second*3)
+			dial, err := grpc.DialContext(withTimeout, service, grpc.WithInsecure(), grpc.WithBlock())
 			if err != nil {
 				log.Println("[mconfig] ", err)
 				continue
