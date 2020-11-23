@@ -1,4 +1,4 @@
-package client
+package pkg
 
 import (
 	"context"
@@ -26,27 +26,25 @@ func (m *Mconfig) initMconfigLink() {
 			ExtraData: m.opts.ABFilters,
 		},
 	}
+
 	//添加连接断开重试机制
 	retryTime := m.opts.RetryTime
 	once := true
-	enableRetry := false
 	started := make(chan interface{})
 	go func(m *Mconfig, started chan interface{}) {
 		for {
-			if enableRetry {
-				<-time.After(retryTime)
-				log.Println("[mconfig] ", "client retry fail... it does not work now.... and will retry after ", retryTime)
+			if !once {
+				log.Println("[mconfig] ", "mconfig retry fail... it does not work now.... and will retry after ", retryTime)
 			}
-			enableRetry = true
+			<-time.After(retryTime)
 			service, err := reg.GetService("mconfig-sdk")
 			if err != nil {
 				log.Println("[mconfig] ", err)
 				continue
 			}
-			withTimeout, _ := context.WithTimeout(context.Background(), time.Second*3)
-			dial, err := grpc.DialContext(withTimeout, service, grpc.WithInsecure(), grpc.WithBlock())
+			dial, err := grpc.Dial(service, grpc.WithInsecure())
 			if err != nil {
-				log.Println("[mconfig] ", err, " addr: ", service)
+				log.Println("[mconfig] ", err)
 				continue
 			}
 			mConfigService := sdk.NewMConfigClient(dial)
@@ -83,7 +81,6 @@ func (m *Mconfig) initMconfigLink() {
 				m.opts.Cache.Lock()
 				m.opts.Cache.Cache = map[string]*FieldInterface{}
 				m.opts.Cache.Unlock()
-				log.Println("refresh mconfig cache...")
 			}
 		}
 	}(m, started)
