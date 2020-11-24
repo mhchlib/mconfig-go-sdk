@@ -1,4 +1,4 @@
-package pkg
+package client
 
 import "log"
 
@@ -9,7 +9,6 @@ type Mconfig struct {
 type Option func(*Options)
 
 func NewMconfig(opts ...Option) Config {
-	//获取默认options
 	options := NewOptions()
 	for _, o := range opts {
 		o(options)
@@ -23,7 +22,7 @@ func NewMconfig(opts ...Option) Config {
 	}
 
 	if options.EnableRegistry == false {
-		log.Fatal("[pkg] you should set an Registry address to link pkg server")
+		log.Fatal("[mconfig] you should set an Registry address to link client server")
 	}
 
 	m := &Mconfig{}

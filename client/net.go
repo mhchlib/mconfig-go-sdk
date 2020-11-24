@@ -1,4 +1,4 @@
-package pkg
+package client
 
 import (
 	"context"
@@ -35,7 +35,7 @@ func (m *Mconfig) initMconfigLink() {
 		for {
 			if enableRetry {
 				<-time.After(retryTime)
-				log.Println("[mconfig] ", "mconfig retry fail... it does not work now.... and will retry after ", retryTime)
+				log.Println("[mconfig] ", "client retry fail... it does not work now.... and will retry after ", retryTime)
 			}
 			enableRetry = true
 			service, err := reg.GetService("mconfig-sdk")
@@ -46,7 +46,7 @@ func (m *Mconfig) initMconfigLink() {
 			withTimeout, _ := context.WithTimeout(context.Background(), time.Second*3)
 			dial, err := grpc.DialContext(withTimeout, service, grpc.WithInsecure(), grpc.WithBlock())
 			if err != nil {
-				log.Println("[mconfig] ", err)
+				log.Println("[mconfig] ", err, " addr: ", service)
 				continue
 			}
 			mConfigService := sdk.NewMConfigClient(dial)
@@ -83,6 +83,7 @@ func (m *Mconfig) initMconfigLink() {
 				m.opts.Cache.Lock()
 				m.opts.Cache.Cache = map[string]*FieldInterface{}
 				m.opts.Cache.Unlock()
+				log.Println("refresh mconfig cache...")
 			}
 		}
 	}(m, started)

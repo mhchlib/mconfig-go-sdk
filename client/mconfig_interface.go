@@ -1,4 +1,4 @@
-package pkg
+package client
 
 type Config interface {
 	String(key string, defaultV ...string) string

@@ -1,4 +1,4 @@
-package pkg
+package client
 
 const (
 	FieldType_String FieldType = iota
