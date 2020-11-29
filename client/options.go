@@ -5,7 +5,7 @@ import "time"
 type Register_Type string
 
 var (
-	RegisterType_Etcd Register_Type = "etcd_custom"
+	RegisterType_Etcd Register_Type = "etcd"
 	//RegisterType_Consoul RegisterType = "consoul"
 )
 

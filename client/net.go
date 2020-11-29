@@ -1,24 +1,23 @@
-package pkg
+package client
 
 import (
 	"context"
 	"github.com/mhchlib/mconfig-api/api/v1/sdk"
 	"github.com/mhchlib/register"
-	etcd_kit "github.com/mhchlib/register/etcd-kit"
+	"github.com/mhchlib/register/mregister"
 	"google.golang.org/grpc"
-	"time"
-
-	//etcdV "github.com/micro/go-micro/v2/registry/etcd_custom"
 	"log"
+	"time"
 )
 
 func (m *Mconfig) initMconfigLink() {
-	var reg register.Register
-	reg = &etcd_kit.EtcdRegister{}
-	reg.Init(func(options *register.Options) {
+	reg, err := register.InitRegister(string(RegisterType_Etcd), func(options *mregister.Options) {
 		options.NameSpace = m.opts.NameSpace
 		options.Address = m.opts.RegistryUrl
 	})
+	if err != nil {
+		log.Fatal("[mconfig] ", "register fail")
+	}
 	request := &sdk.GetVRequest{
 		AppId: m.opts.AppKey,
 		Filters: &sdk.ConfigFilters{
@@ -30,21 +29,24 @@ func (m *Mconfig) initMconfigLink() {
 	//添加连接断开重试机制
 	retryTime := m.opts.RetryTime
 	once := true
+	enableRetry := false
 	started := make(chan interface{})
 	go func(m *Mconfig, started chan interface{}) {
 		for {
-			if !once {
+			if enableRetry {
+				<-time.After(retryTime)
 				log.Println("[mconfig] ", "mconfig retry fail... it does not work now.... and will retry after ", retryTime)
 			}
-			<-time.After(retryTime)
+			enableRetry = true
 			service, err := reg.GetService("mconfig-sdk")
 			if err != nil {
 				log.Println("[mconfig] ", err)
 				continue
 			}
-			dial, err := grpc.Dial(service, grpc.WithInsecure())
+			withTimeout, _ := context.WithTimeout(context.Background(), time.Second*3)
+			dial, err := grpc.DialContext(withTimeout, service, grpc.WithInsecure(), grpc.WithBlock())
 			if err != nil {
-				log.Println("[mconfig] ", err)
+				log.Println("[mconfig] ", err, " addr: ", service)
 				continue
 			}
 			mConfigService := sdk.NewMConfigClient(dial)
@@ -81,6 +83,7 @@ func (m *Mconfig) initMconfigLink() {
 				m.opts.Cache.Lock()
 				m.opts.Cache.Cache = map[string]*FieldInterface{}
 				m.opts.Cache.Unlock()
+				log.Println("refresh mconfig cache...")
 			}
 		}
 	}(m, started)
