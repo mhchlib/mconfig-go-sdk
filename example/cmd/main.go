@@ -8,6 +8,7 @@ import (
 
 func main() {
 	config := client.NewMconfig(
+		client.NameSpace("local_test"),
 		client.Registry(client.RegisterType_Etcd, []string{"etcd.u.hcyang.top:31770"}),
 		client.ABFilters("port", "8080"), //meta data
 		client.ABFilters("ip", "192.0.0.1"),
