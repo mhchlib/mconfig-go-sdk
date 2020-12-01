@@ -1,8 +1,8 @@
 package main
 
 import (
+	log "github.com/mhchlib/logger"
 	"github.com/mhchlib/mconfig-go-sdk/client"
-	"log"
 	"time"
 )
 
@@ -16,10 +16,13 @@ func main() {
 		client.ConfigKey("1000"),
 		client.RetryTime(15*time.Second),
 	)
-	//`{"name":{"first":"Janet","last":"Prichard"},"age":47}`
+	old := ""
 	for {
 		b := config.String("name")
-		log.Print(b)
+		if b != old {
+			log.Info(b)
+			old = b
+		}
 		time.Sleep(time.Second * 3)
 	}
 }
