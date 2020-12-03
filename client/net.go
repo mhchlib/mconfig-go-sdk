@@ -19,7 +19,7 @@ func (m *Mconfig) initMconfigLink() {
 		log.Fatal("[mconfig] ", "register fail")
 	}
 	request := &sdk.GetVRequest{
-		AppId: m.opts.AppKey,
+		AppKey: m.opts.AppKey,
 		Filters: &sdk.ConfigFilters{
 			ConfigIds: m.opts.ConfigKeys,
 			ExtraData: m.opts.ABFilters,
@@ -34,8 +34,8 @@ func (m *Mconfig) initMconfigLink() {
 	go func(m *Mconfig, started chan interface{}) {
 		for {
 			if enableRetry {
-				<-time.After(retryTime)
 				log.Println("[mconfig] ", "mconfig retry fail... it does not work now.... and will retry after ", retryTime)
+				<-time.After(retryTime)
 			}
 			enableRetry = true
 			service, err := reg.GetService("mconfig-sdk")
@@ -70,7 +70,7 @@ func (m *Mconfig) initMconfigLink() {
 				data := m.opts.ConfigsData
 				data.Lock()
 				for _, config := range configs {
-					data.Data[config.Id] = config.Config
+					data.Data[config.Key] = config.Config
 				}
 				data.Unlock()
 				if once {
