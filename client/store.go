@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/tidwall/gjson"
-	"log"
 	"strings"
 	"sync"
 )
@@ -34,7 +33,8 @@ func (m *Mconfig) getValueFromCache(key string, fieldType FieldType) (FieldInter
 }
 
 func (m *Mconfig) reloadConfigData(key string, fieldType FieldType) (ret FieldInterface, err error) {
-	log.Println("[mconfig] reload config from client server")
+	log := m.opts.Logger
+	log.Info(" reload config from client server")
 	defer func() {
 		if err == nil {
 			//load the data to cache

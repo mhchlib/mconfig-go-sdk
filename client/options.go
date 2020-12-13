@@ -1,6 +1,9 @@
 package client
 
-import "time"
+import (
+	log "github.com/mhchlib/logger"
+	"time"
+)
 
 type Register_Type string
 
@@ -15,18 +18,20 @@ const (
 )
 
 type Options struct {
-	NameSpace       string
-	RegistryUrl     []string
-	RegistryType    Register_Type
-	ABFilters       map[string]string
-	AppKey          string
-	ConfigKeys      []string
-	ConfigsData     *OriginConfigCache
-	Cache           *ConfigCache
-	RetryTime       time.Duration
-	EnableRetry     bool
-	EnableNameSpace bool
-	EnableRegistry  bool
+	NameSpace         string
+	RegistryUrl       []string
+	RegistryType      Register_Type
+	ABFilters         map[string]string
+	AppKey            string
+	ConfigKeys        []string
+	ConfigsData       *OriginConfigCache
+	Cache             *ConfigCache
+	RetryTime         time.Duration
+	EnableRetry       bool
+	EnableNameSpace   bool
+	EnableRegistry    bool
+	DirectLinkAddress string
+	Logger            log.Logger
 }
 
 func NewOptions() *Options {
@@ -45,6 +50,12 @@ func Registry(registerType Register_Type, registerUrl []string) Option {
 		options.RegistryType = registerType
 		options.RegistryUrl = registerUrl
 		options.EnableRegistry = true
+	}
+}
+
+func DirectLinkAddress(address string) Option {
+	return func(options *Options) {
+		options.DirectLinkAddress = address
 	}
 }
 
@@ -87,5 +98,11 @@ func ConfigKey(keys ...string) Option {
 		}
 		configKeys = append(configKeys, keys...)
 		options.ConfigKeys = configKeys
+	}
+}
+
+func Logger(log log.Logger) Option {
+	return func(options *Options) {
+		options.Logger = log
 	}
 }

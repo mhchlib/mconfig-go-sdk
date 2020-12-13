@@ -1,6 +1,6 @@
 package client
 
-import "log"
+import log "github.com/mhchlib/logger"
 
 type Mconfig struct {
 	opts *Options
@@ -21,10 +21,16 @@ func NewMconfig(opts ...Option) Config {
 		options.NameSpace = Default_NameSpace
 	}
 
-	if options.EnableRegistry == false {
-		log.Fatal("[mconfig] you should set an Registry address to link client server")
+	if options.Logger == nil {
+		options.Logger = log.NewLogger(
+			log.EnableCodeData(false),
+			log.MetaData("provider", "mconfig"),
+		)
 	}
 
+	//if options.EnableRegistry == false {
+	//	log.Fatal("[mconfig] you should set an Registry address to link client server")
+	//}
 	m := &Mconfig{}
 	m.opts = options
 	m.initMconfigLink()
