@@ -2,44 +2,44 @@ package client
 
 import (
 	"context"
-	"github.com/mhchlib/mconfig-api/api/v1/sdk"
+	"github.com/mhchlib/mconfig-api/api/v1/server"
 	"github.com/mhchlib/register"
-	"github.com/mhchlib/register/mregister"
+	"github.com/mhchlib/register/reg"
 	"google.golang.org/grpc"
 	"time"
 )
 
-func initAddressProvider(m *Mconfig) func(serviceName string) (string, error) {
+func initAddressProvider(m *Mconfig) func(serviceName string) (*reg.ServiceVal, error) {
 	log := m.opts.Logger
 	if m.opts.EnableRegistry {
-		reg, err := register.InitRegister(string(RegisterType_Etcd), func(options *mregister.Options) {
+		regClient, err := register.InitRegister(string(RegisterType_Etcd), func(options *reg.Options) {
 			options.NameSpace = m.opts.NameSpace
 			options.Address = m.opts.RegistryUrl
 		})
 		if err != nil {
 			log.Fatal("register fail")
 		}
-		return func(serviceName string) (string, error) {
-			return reg.GetService(serviceName)
+		return func(serviceName string) (*reg.ServiceVal, error) {
+			return regClient.GetService(serviceName)
 		}
 	}
 	if m.opts.DirectLinkAddress == "" {
 		log.Fatal("you should provider a direct link address or an register center address...")
 	}
-	return func(serviceName string) (string, error) {
-		return m.opts.DirectLinkAddress, nil
+	return func(serviceName string) (*reg.ServiceVal, error) {
+		return &reg.ServiceVal{
+			Address: m.opts.DirectLinkAddress,
+		}, nil
 	}
 }
 
 func (m *Mconfig) initMconfigLink() {
 	log := m.opts.Logger
 	addressProvider := initAddressProvider(m)
-	request := &sdk.GetVRequest{
-		AppKey: m.opts.AppKey,
-		Filters: &sdk.ConfigFilters{
-			ConfigIds: m.opts.ConfigKeys,
-			ExtraData: m.opts.ABFilters,
-		},
+	request := &server.WatchConfigStreamRequest{
+		AppKey:     m.opts.AppKey,
+		ConfigKeys: m.opts.ConfigKeys,
+		Metadata:   m.opts.Metadata,
 	}
 
 	//添加连接断开重试机制
@@ -54,19 +54,19 @@ func (m *Mconfig) initMconfigLink() {
 				<-time.After(retryTime)
 			}
 			enableRetry = true
-			service, err := addressProvider("mconfig-sdk")
+			service, err := addressProvider("mconfig-server")
 			if err != nil {
 				log.Info(err)
 				continue
 			}
 			withTimeout, _ := context.WithTimeout(context.Background(), time.Second*3)
-			dial, err := grpc.DialContext(withTimeout, service, grpc.WithInsecure(), grpc.WithBlock())
+			dial, err := grpc.DialContext(withTimeout, service.Address, grpc.WithInsecure(), grpc.WithBlock())
 			if err != nil {
 				log.Info(err, " addr: ", service)
 				continue
 			}
-			mConfigService := sdk.NewMConfigClient(dial)
-			stream, err := mConfigService.GetVStream(context.Background())
+			mConfigService := server.NewMConfigClient(dial)
+			stream, err := mConfigService.WatchConfigStream(context.Background())
 			if err != nil {
 				log.Info(err)
 				continue
@@ -78,6 +78,7 @@ func (m *Mconfig) initMconfigLink() {
 			}
 			for {
 				recv, err := stream.Recv()
+				log.Info(recv)
 				if err != nil {
 					log.Info(err)
 					break
@@ -86,7 +87,7 @@ func (m *Mconfig) initMconfigLink() {
 				data := m.opts.ConfigsData
 				data.Lock()
 				for _, config := range configs {
-					data.Data[config.Key] = config.Config
+					data.Data[config.ConfigKey] = config.Val
 				}
 				data.Unlock()
 				if once {

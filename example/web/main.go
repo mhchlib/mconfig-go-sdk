@@ -10,13 +10,13 @@ func main() {
 	config := client.NewMconfig(
 		client.NameSpace("local_test"),
 		client.Registry(client.RegisterType_Etcd, []string{"etcd.u.hcyang.top:31770"}),
-		client.ABFilters("port", "8080"), //meta data
-		client.ABFilters("ip", "192.0.0.1"),
+		client.Metadata("port", "8080"), //meta data
+		client.Metadata("ip", "192.0.0.1"),
 		client.AppKey("test"),
 		client.ConfigKey("tconfig", "101", "102", "103", "104"),
 	)
 	r := gin.Default()
-	r.GET("/mconfig/:type/name/:var", func(c *gin.Context) {
+	r.GET("/mconfig-server/:type/name/:var", func(c *gin.Context) {
 		pVar := c.Param("var")
 		pType := c.Param("type")
 		log.Println(pVar, pType)

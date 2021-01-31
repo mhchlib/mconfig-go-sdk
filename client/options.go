@@ -21,7 +21,7 @@ type Options struct {
 	NameSpace         string
 	RegistryUrl       []string
 	RegistryType      Register_Type
-	ABFilters         map[string]string
+	Metadata          map[string]string
 	AppKey            string
 	ConfigKeys        []string
 	ConfigsData       *OriginConfigCache
@@ -66,14 +66,14 @@ func NameSpace(namespace string) Option {
 	}
 }
 
-func ABFilters(key string, value string) Option {
+func Metadata(key string, value string) Option {
 	return func(options *Options) {
-		abfilters := options.ABFilters
+		abfilters := options.Metadata
 		if abfilters == nil {
 			abfilters = map[string]string{}
 		}
 		abfilters[key] = value
-		options.ABFilters = abfilters
+		options.Metadata = abfilters
 	}
 }
 
