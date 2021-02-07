@@ -12,8 +12,8 @@ func main() {
 		client.Registry(client.RegisterType_Etcd, []string{"etcd.u.hcyang.top:31770"}),
 		client.Metadata("port", "8080"), //meta data
 		client.Metadata("ip", "192.0.0.1"),
-		client.AppKey("test"),
-		client.ConfigKey("tconfig", "101", "102", "103", "104"),
+		client.AppKey("app_tPHKz7IcNtV"),
+		client.ConfigKey("config_tP2aWIibhNJ"),
 	)
 	r := gin.Default()
 	r.GET("/mconfig-server/:type/name/:var", func(c *gin.Context) {
