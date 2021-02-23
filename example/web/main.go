@@ -2,18 +2,18 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/mhchlib/mconfig-go-sdk/client"
+	"github.com/mhchlib/mconfig-go-sdk/mconfig"
 	"log"
 )
 
 func main() {
-	config := client.NewMconfig(
-		client.NameSpace("local_test"),
-		client.Registry(client.RegisterType_Etcd, []string{"etcd.u.hcyang.top:31770"}),
-		client.Metadata("port", "8080"), //meta data
-		client.Metadata("ip", "192.0.0.1"),
-		client.AppKey("app_tPHKz7IcNtV"),
-		client.ConfigKey("config_tP2aWIibhNJ"),
+	config := mconfig.NewMconfig(
+		mconfig.NameSpace("local_test"),
+		mconfig.Registry(mconfig.RegisterType_Etcd, []string{"etcd.u.hcyang.top:31770"}),
+		mconfig.Metadata("port", "8080"), //meta data
+		mconfig.Metadata("ip", "192.0.0.1"),
+		mconfig.AppKey("app_tPss5k5H_DS"),
+		mconfig.ConfigKey("config_tPssCRQrGxh"),
 	)
 	r := gin.Default()
 	r.GET("/mconfig-server/:type/name/:var", func(c *gin.Context) {
