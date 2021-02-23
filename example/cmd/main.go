@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	config := mconfig.NewMconfig(
+	config := mconfig.NewClient(
 		mconfig.NameSpace("local_test"),
 		//mconfig.Registry(mconfig.RegisterType_Etcd, []string{"etcd.u.hcyang.top:31770"}),
 		mconfig.DirectLinkAddress("127.0.0.1:8081"),

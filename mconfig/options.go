@@ -18,7 +18,7 @@ const (
 )
 
 type Options struct {
-	NameSpace         string
+	Namespace         string
 	RegistryUrl       []string
 	RegistryType      Register_Type
 	Metadata          map[string]string
@@ -61,7 +61,7 @@ func DirectLinkAddress(address string) Option {
 
 func NameSpace(namespace string) Option {
 	return func(options *Options) {
-		options.NameSpace = namespace
+		options.Namespace = namespace
 		options.EnableNameSpace = true
 	}
 }

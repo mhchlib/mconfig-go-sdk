@@ -18,7 +18,7 @@ func NewClient(opts ...Option) Config {
 	}
 
 	if options.EnableNameSpace == false {
-		options.NameSpace = Default_NameSpace
+		options.Namespace = Default_NameSpace
 	}
 
 	if options.Logger == nil {

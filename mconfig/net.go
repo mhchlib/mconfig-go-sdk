@@ -12,11 +12,11 @@ import (
 func initAddressProvider(m *Mconfig) func(serviceName string) (*register.ServiceVal, error) {
 	log := m.opts.Logger
 	if m.opts.EnableRegistry {
-		regClient, err := register.InitRegister(func(options *register.Options) {
-			options.RegisterType = register.RegistryType(RegisterType_Etcd)
-			options.NameSpace = m.opts.NameSpace
-			options.Address = m.opts.RegistryUrl
-		})
+		regClient, err := register.InitRegister(
+			register.SelectEtcdRegister(),
+			register.ResgisterAddress(m.opts.RegistryUrl),
+			register.Namespace(m.opts.Namespace),
+		)
 		if err != nil {
 			log.Fatal("register fail")
 		}
