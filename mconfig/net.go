@@ -5,31 +5,30 @@ import (
 	"github.com/mhchlib/mconfig-api/api/v1/server"
 	"github.com/mhchlib/mconfig-go-sdk/adapter"
 	"github.com/mhchlib/register"
-	"github.com/mhchlib/register/reg"
 	"google.golang.org/grpc"
 	"time"
 )
 
-func initAddressProvider(m *Mconfig) func(serviceName string) (*reg.ServiceVal, error) {
+func initAddressProvider(m *Mconfig) func(serviceName string) (*register.ServiceVal, error) {
 	log := m.opts.Logger
 	if m.opts.EnableRegistry {
-		regClient, err := register.InitRegister(func(options *reg.Options) {
-			options.RegisterType = reg.RegistryType(RegisterType_Etcd)
+		regClient, err := register.InitRegister(func(options *register.Options) {
+			options.RegisterType = register.RegistryType(RegisterType_Etcd)
 			options.NameSpace = m.opts.NameSpace
 			options.Address = m.opts.RegistryUrl
 		})
 		if err != nil {
 			log.Fatal("register fail")
 		}
-		return func(serviceName string) (*reg.ServiceVal, error) {
+		return func(serviceName string) (*register.ServiceVal, error) {
 			return regClient.GetService(serviceName)
 		}
 	}
 	if m.opts.DirectLinkAddress == "" {
 		log.Fatal("you should provider a direct link address or an register center address...")
 	}
-	return func(serviceName string) (*reg.ServiceVal, error) {
-		return &reg.ServiceVal{
+	return func(serviceName string) (*register.ServiceVal, error) {
+		return &register.ServiceVal{
 			Address: m.opts.DirectLinkAddress,
 		}, nil
 	}
