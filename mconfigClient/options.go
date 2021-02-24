@@ -1,4 +1,4 @@
-package mconfig
+package mconfigClient
 
 import (
 	log "github.com/mhchlib/logger"
@@ -18,91 +18,83 @@ const (
 )
 
 type Options struct {
-	Namespace         string
-	RegistryUrl       []string
-	RegistryType      Register_Type
-	Metadata          map[string]string
-	AppKey            string
-	ConfigKeys        []string
-	ConfigsData       *OriginConfigCache
-	Cache             *ConfigCache
-	RetryTime         time.Duration
-	EnableRetry       bool
-	EnableNameSpace   bool
-	EnableRegistry    bool
-	DirectLinkAddress string
-	Logger            log.Logger
+	namespace         string
+	registryUrl       []string
+	registryType      Register_Type
+	metadata          map[string]string
+	appKey            string
+	configKeys        []string
+	retryIntervalTime time.Duration
+	enableRetry       bool
+	enableNameSpace   bool
+	enableRegistry    bool
+	directLinkAddress string
+	logger            log.Logger
 }
 
 func NewOptions() *Options {
 	o := &Options{}
-	o.Cache = &ConfigCache{
-		Cache: make(map[string]*FieldInterface),
-	}
-	o.ConfigsData = &OriginConfigCache{
-		Data: make(map[string]string),
-	}
 	return o
 }
 
 func Registry(registerType Register_Type, registerUrl []string) Option {
 	return func(options *Options) {
-		options.RegistryType = registerType
-		options.RegistryUrl = registerUrl
-		options.EnableRegistry = true
+		options.registryType = registerType
+		options.registryUrl = registerUrl
+		options.enableRegistry = true
 	}
 }
 
 func DirectLinkAddress(address string) Option {
 	return func(options *Options) {
-		options.DirectLinkAddress = address
+		options.directLinkAddress = address
 	}
 }
 
 func NameSpace(namespace string) Option {
 	return func(options *Options) {
-		options.Namespace = namespace
-		options.EnableNameSpace = true
+		options.namespace = namespace
+		options.enableNameSpace = true
 	}
 }
 
 func Metadata(key string, value string) Option {
 	return func(options *Options) {
-		abfilters := options.Metadata
+		abfilters := options.metadata
 		if abfilters == nil {
 			abfilters = map[string]string{}
 		}
 		abfilters[key] = value
-		options.Metadata = abfilters
+		options.metadata = abfilters
 	}
 }
 
 func AppKey(appKey string) Option {
 	return func(options *Options) {
-		options.AppKey = appKey
+		options.appKey = appKey
 	}
 }
 
-func RetryTime(t time.Duration) Option {
+func RetryIntervalTime(t time.Duration) Option {
 	return func(options *Options) {
-		options.RetryTime = t
-		options.EnableRetry = true
+		options.retryIntervalTime = t
+		options.enableRetry = true
 	}
 }
 
 func ConfigKey(keys ...string) Option {
 	return func(options *Options) {
-		configKeys := options.ConfigKeys
+		configKeys := options.configKeys
 		if configKeys == nil {
 			configKeys = []string{}
 		}
 		configKeys = append(configKeys, keys...)
-		options.ConfigKeys = configKeys
+		options.configKeys = configKeys
 	}
 }
 
 func Logger(log log.Logger) Option {
 	return func(options *Options) {
-		options.Logger = log
+		options.logger = log
 	}
 }
