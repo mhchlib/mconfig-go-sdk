@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	log "github.com/mhchlib/logger"
 	"github.com/mhchlib/mconfig-api/api/v1/server"
 	"github.com/mhchlib/register"
@@ -196,7 +197,12 @@ func (m *MconfigClientV1) initAddressProvider() func(serviceName string) (*regis
 			log.Fatal("register fail")
 		}
 		return func(serviceName string) (*register.ServiceVal, error) {
-			return regClient.GetService(serviceName)
+			val, err := regClient.GetService(serviceName)
+			if err != nil {
+				return nil, err
+			}
+			log.Info("get service address:", fmt.Sprintf("%+v", val))
+			return val, nil
 		}
 	}
 	if m.opts.directLinkAddress == "" {
@@ -237,7 +243,7 @@ func (m *MconfigClientV1) initMconfigEngine() {
 			withTimeout, _ := context.WithTimeout(context.Background(), time.Second*3)
 			dial, err := grpc.DialContext(withTimeout, service.Address, grpc.WithInsecure(), grpc.WithBlock())
 			if err != nil {
-				log.Info(err, " addr: ", service)
+				log.Info(err, " addr:", fmt.Sprintf("%+v", service))
 				continue
 			}
 			mConfigService := server.NewMConfigClient(dial)
