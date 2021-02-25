@@ -1,4 +1,4 @@
-package mconfigClient
+package mconfig
 
 type MconfigClient interface {
 	Config

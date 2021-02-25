@@ -1,4 +1,4 @@
-package mconfigClient
+package mconfig
 
 import (
 	"context"
@@ -449,8 +449,7 @@ func (m *MconfigClientV1) executeConfigWatchNotify() {
 	defer m.configWatchMap.Unlock()
 	for key, configWatch := range m.configWatchMap.m {
 		newVal := m.Interface(key, struct{}{})
-		log.Info(key, configWatch.oldV, newVal)
-
+		//log.Info(key, configWatch.oldV, newVal)
 		if newVal != configWatch.oldV {
 			configWatch.callback(key, newVal)
 			configWatch.oldV = newVal

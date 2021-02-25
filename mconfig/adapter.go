@@ -1,4 +1,4 @@
-package mconfigClient
+package mconfig
 
 import (
 	"github.com/spf13/viper"

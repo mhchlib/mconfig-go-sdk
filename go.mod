@@ -7,6 +7,7 @@ require (
 	github.com/mhchlib/logger v0.0.0-20201023050446-420de20374cc
 	github.com/mhchlib/mconfig-api v0.0.0-20201023050446-420de20374cc
 	github.com/mhchlib/register v0.0.0-20201119163729-b999bdbd2d49
+	github.com/prometheus/common v0.6.0
 	github.com/spf13/viper v1.7.1
 	github.com/tidwall/gjson v1.6.3
 	google.golang.org/grpc v1.26.0
@@ -17,4 +18,3 @@ replace github.com/mhchlib/logger v0.0.0-20201023050446-420de20374cc => ../logge
 replace github.com/mhchlib/register v0.0.0-20201119163729-b999bdbd2d49 => ../register
 
 replace github.com/mhchlib/mconfig-api v0.0.0-20201023050446-420de20374cc => ../mconfig-api
-

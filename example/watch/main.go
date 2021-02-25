@@ -1,18 +1,13 @@
 package main
 
 import (
-	log "github.com/mhchlib/logger"
 	"github.com/mhchlib/mconfig-go-sdk/mconfig"
-	"github.com/spf13/viper"
+	"github.com/prometheus/common/log"
 	"time"
 )
 
 func main() {
-	viper.AddConfigPath("conf/")
-	err := viper.ReadInConfig() // Find and read the config file
-	if err != nil {             // Handle errors reading the config file
-		log.Fatal("Fatal error config file: %s \n", err)
-	}
+
 	mconfigClient := mconfig.NewClient(
 		mconfig.NameSpace("local_test"),
 		//mconfigClient.Registry(mconfigClient.RegisterType_Etcd, []string{"etcd.u.hcyang.top:31770"}),
@@ -23,11 +18,9 @@ func main() {
 		mconfig.ConfigKey("config_tPssCRQrGxh"),
 		mconfig.RetryIntervalTime(15*time.Second),
 	)
-	mconfigClient.AdapterMconfigMergeToViper()
+	mconfigClient.OnWatchConfigChange("name", func(key string, value interface{}) {
+		log.Info(key, value)
+	})
 
-	for {
-		log.Info(viper.Get("name.first"))
-		<-time.After(5 * time.Second)
-	}
 	select {}
 }

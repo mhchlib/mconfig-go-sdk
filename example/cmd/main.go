@@ -2,20 +2,20 @@ package main
 
 import (
 	log "github.com/mhchlib/logger"
-	"github.com/mhchlib/mconfig-go-sdk/mconfigClient"
+	"github.com/mhchlib/mconfig-go-sdk/mconfig"
 	"time"
 )
 
 func main() {
-	config := mconfigClient.NewClient(
-		mconfigClient.NameSpace("local_test"),
+	config := mconfig.NewClient(
+		mconfig.NameSpace("local_test"),
 		//mconfig.Registry(mconfig.RegisterType_Etcd, []string{"etcd.u.hcyang.top:31770"}),
-		mconfigClient.DirectLinkAddress("127.0.0.1:8081"),
+		mconfig.DirectLinkAddress("127.0.0.1:8081"),
 		//mconfig.Metadata("port", "8080"), //meta data
-		mconfigClient.Metadata("ip", "192.0.0.1"),
-		mconfigClient.AppKey("app_tPss5k5H_DS"),
-		mconfigClient.ConfigKey("config_tPssCRQrGxh"),
-		mconfigClient.RetryTime(15*time.Second),
+		mconfig.Metadata("ip", "192.0.0.1"),
+		mconfig.AppKey("app_tPss5k5H_DS"),
+		mconfig.ConfigKey("config_tPssCRQrGxh"),
+		mconfig.RetryTime(15*time.Second),
 	)
 	old := ""
 	for {
