@@ -24,6 +24,7 @@ type Options struct {
 	metadata          map[string]string
 	appKey            string
 	configKeys        []string
+	envKey            string
 	retryIntervalTime time.Duration
 	enableRetry       bool
 	enableNameSpace   bool
@@ -72,6 +73,12 @@ func Metadata(key string, value string) Option {
 func AppKey(appKey string) Option {
 	return func(options *Options) {
 		options.appKey = appKey
+	}
+}
+
+func EnvKey(envKey string) Option {
+	return func(options *Options) {
+		options.envKey = envKey
 	}
 }
 
