@@ -220,6 +220,7 @@ func (m *MconfigClientV1) initMconfigEngine() {
 	addressProvider := m.initAddressProvider()
 	request := &server.WatchConfigStreamRequest{
 		AppKey:     m.opts.appKey,
+		EnvKey:     m.opts.envKey,
 		ConfigKeys: m.opts.configKeys,
 		Metadata:   m.opts.metadata,
 	}
@@ -235,7 +236,7 @@ func (m *MconfigClientV1) initMconfigEngine() {
 				<-time.After(retryTime)
 			}
 			enableRetry = true
-			service, err := addressProvider("mconfig")
+			service, err := addressProvider("mconfig-server")
 			if err != nil {
 				log.Info(err)
 				continue
