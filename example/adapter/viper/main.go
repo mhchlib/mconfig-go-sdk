@@ -20,8 +20,7 @@ func main() {
 		//mconfig.Metadata("port", "8080"), //meta data
 		mconfig.Metadata("ip", "192.0.0.1"),
 		mconfig.AppKey("app_tPss5k5H_DS"),
-		mconfig.EnvKey("???"),
-		//mconfig.ConfigKey("config_tPssCRQrGxh"),
+		mconfig.ConfigKey("config_tPssCRQrGxh"),
 		mconfig.RetryIntervalTime(15*time.Second),
 	)
 	mconfigClient.AdapterMconfigMergeToViper()
