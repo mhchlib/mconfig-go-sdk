@@ -251,11 +251,13 @@ func (m *MconfigClientV1) initMconfigEngine() {
 			stream, err := mConfigService.WatchConfigStream(context.Background())
 			if err != nil {
 				log.Info(err)
+				dial.Close()
 				continue
 			}
 			err = stream.SendMsg(request)
 			if err != nil {
 				log.Info(err)
+				dial.Close()
 				continue
 			}
 			for {
@@ -263,6 +265,7 @@ func (m *MconfigClientV1) initMconfigEngine() {
 				log.Info(recv)
 				if err != nil {
 					log.Info(err)
+					dial.Close()
 					break
 				}
 

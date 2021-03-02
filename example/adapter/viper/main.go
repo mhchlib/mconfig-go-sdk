@@ -15,12 +15,13 @@ func main() {
 	}
 	mconfigClient := mconfig.NewClient(
 		mconfig.NameSpace("local_test"),
-		//mconfigClient.Registry(mconfigClient.RegisterType_Etcd, []string{"etcd.u.hcyang.top:31770"}),
-		mconfig.DirectLinkAddress("127.0.0.1:8081"),
+		mconfig.Registry(mconfig.RegisterType_Etcd, []string{"etcd.u.hcyang.top:31770"}),
+		//mconfig.DirectLinkAddress("127.0.0.1:8081"),
 		//mconfig.Metadata("port", "8080"), //meta data
 		mconfig.Metadata("ip", "192.0.0.1"),
 		mconfig.AppKey("app_tPss5k5H_DS"),
-		mconfig.ConfigKey("config_tPssCRQrGxh"),
+		mconfig.EnvKey("???"),
+		//mconfig.ConfigKey("config_tPssCRQrGxh"),
 		mconfig.RetryIntervalTime(15*time.Second),
 	)
 	mconfigClient.AdapterMconfigMergeToViper()
