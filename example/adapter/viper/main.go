@@ -14,9 +14,11 @@ func main() {
 		log.Fatal("Fatal error config file: %s \n", err)
 	}
 	mconfigClient := mconfig.NewClient(
+		//mconfig.NameSpace("com.github.mhchlib"),
 		mconfig.NameSpace("local_test"),
-		mconfig.Registry(mconfig.RegisterType_Etcd, []string{"etcd.u.hcyang.top:31770"}),
+		mconfig.Registry("etcd://etcd.u.hcyang.top:31770"),
 		//mconfig.DirectLinkAddress("127.0.0.1:8081"),
+		//mconfig.DirectLinkAddress("mconfig.u.hcyang.top:8080"),
 		//mconfig.Metadata("port", "8080"), //meta data
 		mconfig.Metadata("ip", "192.0.0.1"),
 		mconfig.AppKey("app_tPss5k5H_DS"),

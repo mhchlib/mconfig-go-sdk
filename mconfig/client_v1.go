@@ -38,7 +38,7 @@ func NewClient(opts ...Option) MconfigClient {
 
 	if options.logger == nil {
 		options.logger = log.NewLogger(
-			log.EnableCodeData(false),
+			log.EnableCodeData(true),
 			log.MetaData("provider", "mconfig"),
 		)
 	}
@@ -187,17 +187,16 @@ func (m *MconfigClientV1) AdapterMconfigMergeToViper(viperArr ...*viper.Viper) e
 
 func (m *MconfigClientV1) initAddressProvider() func(serviceName string) (*register.ServiceVal, error) {
 	log := m.opts.logger
-	if m.opts.enableRegistry {
+	if m.opts.registryAddress != "" {
 		regClient, err := register.InitRegister(
-			register.SelectEtcdRegister(),
-			register.ResgisterAddress(m.opts.registryUrl),
+			register.ResgisterAddress(m.opts.registryAddress),
 			register.Namespace(m.opts.namespace),
 		)
 		if err != nil {
 			log.Fatal("register fail")
 		}
 		return func(serviceName string) (*register.ServiceVal, error) {
-			val, err := regClient.GetService(serviceName)
+			val, err := regClient.Srv.GetService(serviceName)
 			if err != nil {
 				return nil, err
 			}
