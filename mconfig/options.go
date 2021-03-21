@@ -19,8 +19,7 @@ const (
 
 type Options struct {
 	namespace         string
-	registryUrl       []string
-	registryType      Register_Type
+	registryAddress   string
 	metadata          map[string]string
 	appKey            string
 	configKeys        []string
@@ -28,7 +27,6 @@ type Options struct {
 	retryIntervalTime time.Duration
 	enableRetry       bool
 	enableNameSpace   bool
-	enableRegistry    bool
 	directLinkAddress string
 	logger            log.Logger
 }
@@ -38,11 +36,9 @@ func NewOptions() *Options {
 	return o
 }
 
-func Registry(registerType Register_Type, registerUrl []string) Option {
+func Registry(registerUrl string) Option {
 	return func(options *Options) {
-		options.registryType = registerType
-		options.registryUrl = registerUrl
-		options.enableRegistry = true
+		options.registryAddress = registerUrl
 	}
 }
 
