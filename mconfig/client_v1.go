@@ -15,6 +15,7 @@ import (
 	"time"
 )
 
+// MconfigClientV1 ...
 type MconfigClientV1 struct {
 	opts            *Options
 	apdterCallBacks AdapterCallBacks
@@ -23,6 +24,7 @@ type MconfigClientV1 struct {
 	configWatchMap  *ConfigWatchMap
 }
 
+// NewClient ...
 func NewClient(opts ...Option) MconfigClient {
 	options := NewOptions()
 	for _, o := range opts {
@@ -157,6 +159,7 @@ func (m *MconfigClientV1) reloadConfigData(key string, fieldType FieldType) (ret
 	return nil, errors.New("not found from origin config")
 }
 
+// AdapterMconfigMergeToViper ...
 func (m *MconfigClientV1) AdapterMconfigMergeToViper(viperArr ...*viper.Viper) error {
 	if len(viperArr) == 0 {
 		viperArr = append(viperArr, viper.GetViper())
@@ -193,7 +196,7 @@ func (m *MconfigClientV1) initAddressProvider() func(serviceName string) (*regis
 			register.Namespace(m.opts.namespace),
 		)
 		if err != nil {
-			log.Fatal("register fail")
+			log.Fatal("register fail", err)
 		}
 		return func(serviceName string) (*register.ServiceVal, error) {
 			val, err := regClient.Srv.GetService(serviceName)
@@ -295,6 +298,7 @@ func (m *MconfigClientV1) initMconfigEngine() {
 	close(started)
 }
 
+// String ...
 func (m *MconfigClientV1) String(key string, defaultVs ...string) string {
 	var defaultV string
 	if len(defaultVs) >= 1 {
@@ -321,6 +325,7 @@ func (m *MconfigClientV1) String(key string, defaultVs ...string) string {
 
 }
 
+// Int64 ...
 func (m *MconfigClientV1) Int64(key string, defaultVs ...int64) int64 {
 	var defaultV int64
 	if len(defaultVs) >= 1 {
@@ -346,6 +351,7 @@ func (m *MconfigClientV1) Int64(key string, defaultVs ...int64) int64 {
 	return data.Value
 }
 
+// Bool ...
 func (m *MconfigClientV1) Bool(key string, defaultVs ...bool) bool {
 	var defaultV bool
 	if len(defaultVs) >= 1 {
@@ -371,6 +377,7 @@ func (m *MconfigClientV1) Bool(key string, defaultVs ...bool) bool {
 	return data.Value
 }
 
+// Map ...
 func (m *MconfigClientV1) Map(key string, defaultVs ...map[string]interface{}) map[string]interface{} {
 	var defaultV map[string]interface{}
 	if len(defaultVs) >= 1 {
@@ -396,6 +403,7 @@ func (m *MconfigClientV1) Map(key string, defaultVs ...map[string]interface{}) m
 	return data.Value
 }
 
+// SliceList ...
 func (m *MconfigClientV1) SliceList(key string, defaultVs ...[]interface{}) []interface{} {
 	var defaultV []interface{}
 	if len(defaultVs) >= 1 {
@@ -422,6 +430,7 @@ func (m *MconfigClientV1) SliceList(key string, defaultVs ...[]interface{}) []in
 	return data.Value
 }
 
+// Interface ...
 func (m *MconfigClientV1) Interface(key string, defaultV interface{}) interface{} {
 	cache, err := m.getValueFromCache(key, FieldType_Interface)
 	if err != nil {
@@ -441,6 +450,7 @@ func (m *MconfigClientV1) Interface(key string, defaultV interface{}) interface{
 	return data.Value
 }
 
+// OnWatchConfigChange ...
 func (m *MconfigClientV1) OnWatchConfigChange(key string, f ConfigChangeCallBack) {
 	m.configWatchMap.AddConfigChangeCallBack(key, m.Interface(key, struct{}{}), f)
 }

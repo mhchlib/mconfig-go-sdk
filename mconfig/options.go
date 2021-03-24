@@ -5,18 +5,22 @@ import (
 	"time"
 )
 
+// Register_Type ...
 type Register_Type string
 
 var (
+	// RegisterType_Etcd ...
 	RegisterType_Etcd Register_Type = "etcd"
-	//RegisterType_Consoul RegisterType = "consoul"
 )
 
 const (
+	// Default_Retry_Time ...
 	Default_Retry_Time = 5 * time.Second
-	Default_NameSpace  = "com.github.mhchlib"
+	// Default_NameSpace ...
+	Default_NameSpace = "com.github.mhchlib"
 )
 
+// Options ...
 type Options struct {
 	namespace         string
 	registryAddress   string
@@ -31,23 +35,27 @@ type Options struct {
 	logger            log.Logger
 }
 
+// NewOptions ...
 func NewOptions() *Options {
 	o := &Options{}
 	return o
 }
 
+// Registry ...
 func Registry(registerUrl string) Option {
 	return func(options *Options) {
 		options.registryAddress = registerUrl
 	}
 }
 
+// DirectLinkAddress ...
 func DirectLinkAddress(address string) Option {
 	return func(options *Options) {
 		options.directLinkAddress = address
 	}
 }
 
+// NameSpace ...
 func NameSpace(namespace string) Option {
 	return func(options *Options) {
 		options.namespace = namespace
@@ -55,6 +63,7 @@ func NameSpace(namespace string) Option {
 	}
 }
 
+// Metadata ...
 func Metadata(key string, value string) Option {
 	return func(options *Options) {
 		abfilters := options.metadata
@@ -66,18 +75,21 @@ func Metadata(key string, value string) Option {
 	}
 }
 
+// AppKey ...
 func AppKey(appKey string) Option {
 	return func(options *Options) {
 		options.appKey = appKey
 	}
 }
 
+// EnvKey ...
 func EnvKey(envKey string) Option {
 	return func(options *Options) {
 		options.envKey = envKey
 	}
 }
 
+// RetryIntervalTime ...
 func RetryIntervalTime(t time.Duration) Option {
 	return func(options *Options) {
 		options.retryIntervalTime = t
@@ -85,6 +97,7 @@ func RetryIntervalTime(t time.Duration) Option {
 	}
 }
 
+// ConfigKey ...
 func ConfigKey(keys ...string) Option {
 	return func(options *Options) {
 		configKeys := options.configKeys
@@ -96,6 +109,7 @@ func ConfigKey(keys ...string) Option {
 	}
 }
 
+// Logger ...
 func Logger(log log.Logger) Option {
 	return func(options *Options) {
 		options.logger = log

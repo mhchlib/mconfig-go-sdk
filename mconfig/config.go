@@ -1,5 +1,6 @@
 package mconfig
 
+// Config ...
 type Config interface {
 	//base
 	String(key string, defaultV ...string) string
@@ -10,6 +11,7 @@ type Config interface {
 	Interface(key string, defaultV interface{}) interface{}
 }
 
+// WatchChange ...
 type WatchChange interface {
 	OnWatchConfigChange(key string, f ConfigChangeCallBack)
 }
