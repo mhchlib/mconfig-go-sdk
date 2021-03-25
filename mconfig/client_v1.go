@@ -7,7 +7,8 @@ import (
 	"fmt"
 	log "github.com/mhchlib/logger"
 	"github.com/mhchlib/mconfig-api/api/v1/server"
-	"github.com/mhchlib/register"
+	"github.com/mhchlib/mregister"
+	"github.com/mhchlib/mregister/register"
 	"github.com/spf13/viper"
 	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
@@ -191,7 +192,7 @@ func (m *MconfigClientV1) AdapterMconfigMergeToViper(viperArr ...*viper.Viper) e
 func (m *MconfigClientV1) initAddressProvider() func(serviceName string) (*register.ServiceVal, error) {
 	log := m.opts.logger
 	if m.opts.registryAddress != "" {
-		regClient, err := register.InitRegister(
+		regClient, err := mregister.InitRegister(
 			register.ResgisterAddress(m.opts.registryAddress),
 			register.Namespace(m.opts.namespace),
 		)

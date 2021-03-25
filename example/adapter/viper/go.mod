@@ -10,7 +10,7 @@ require (
 
 replace github.com/mhchlib/logger v0.0.0-20201023050446-420de20374cc => ../../../../logger
 
-replace github.com/mhchlib/register v0.0.0-20201119163729-b999bdbd2d49 => ../../../../register
+replace github.com/mhchlib/mregister v0.0.0-20201119163729-b999bdbd2d49 => ../../../../mregister
 
 replace github.com/mhchlib/mconfig-api v0.0.0-20201023050446-420de20374cc => ../../../../mconfig-api
 
