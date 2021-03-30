@@ -1,4 +1,4 @@
-package client
+package mconfig
 
 import (
 	"github.com/tidwall/gjson"
