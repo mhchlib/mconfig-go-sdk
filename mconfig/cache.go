@@ -20,7 +20,7 @@ type OriginConfigCache struct {
 }
 
 // Put ...
-func (originConfigCache OriginConfigCache) Put(key string, value string) {
+func (originConfigCache *OriginConfigCache) Put(key string, value string) {
 	originConfigCache.Lock()
 	defer originConfigCache.Unlock()
 	originConfigCache.m[key] = value
