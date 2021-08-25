@@ -15,7 +15,7 @@ func main() {
 		mconfig.Metadata("ip", "192.0.0.1"),
 		mconfig.AppKey("app_tPss5k5H_DS"),
 		mconfig.ConfigKey("config_tPssCRQrGxh"),
-		mconfig.RetryTime(15*time.Second),
+		mconfig.RetryIntervalTime(15*time.Second),
 	)
 	old := ""
 	for {
